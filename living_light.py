@@ -4,7 +4,7 @@ from machine import Pin, PWM
 
 print("=== Levande Ljus ===\n")
 
-# GPIO-pinnar (uppdatera om behövs)
+# GPIO-pinnar (uppdaterad efter omödsodling)
 RED_PIN = 3
 GREEN_PIN = 4
 BLUE_PIN = 5
@@ -18,10 +18,10 @@ print("LED initierad - Njut av det levande ljuset!\n")
 
 def set_color(red, green, blue):
     """Sätt LED-färg (0-255 för varje färg)"""
-    # Konvertera från 0-255 till 0-1023 (duty cycle för PWM)
-    red_pwm.duty(int(red * 4.008))
-    green_pwm.duty(int(green * 4.008))
-    blue_pwm.duty(int(blue * 4.008))
+    # Konvertera från 0-255 till 0-1023 och INVERTERA
+    red_pwm.duty(1023 - int(red * 4.008))
+    green_pwm.duty(1023 - int(green * 4.008))
+    blue_pwm.duty(1023 - int(blue * 4.008))
 
 def set_warm_color(brightness):
     """Sätt varm färg (röd + gul) med given ljusstyrka"""
@@ -57,3 +57,4 @@ try:
 except KeyboardInterrupt:
     print("\nLevande ljus avslutat")
     set_color(0, 0, 0)  # Släck LED:n
+
