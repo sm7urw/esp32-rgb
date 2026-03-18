@@ -1,20 +1,29 @@
 import time
 import random
+import _thread
 from machine import Pin, PWM
 
 print("=== Levande Ljus ===\n")
 
-# GPIO-pinnar (uppdaterad efter omödsodling)
+# GPIO-pinnar
 RED_PIN = 3
 GREEN_PIN = 4
 BLUE_PIN = 5
+BUTTON_PIN = 6
 
 # Konfigurera PWM
 red_pwm = PWM(Pin(RED_PIN), freq=1000)
 green_pwm = PWM(Pin(GREEN_PIN), freq=1000)
 blue_pwm = PWM(Pin(BLUE_PIN), freq=1000)
 
-print("LED initierad - Njut av det levande ljuset!\n")
+# Knapp
+button = Pin(BUTTON_PIN, Pin.IN, Pin.PULL_UP)
+
+# Global flag för att kontrollera ljuset
+light_on = True
+
+print("LED initierad - Njut av det levande ljuset!")
+print("Tryck knappen (GPIO 6) för att slå av/på ljuset\n")
 
 def set_color(red, green, blue):
     """Sätt LED-färg (0-255 för varje färg)"""
@@ -37,24 +46,52 @@ def set_warm_color(brightness):
     
     set_color(red, green, blue)
 
+def check_button():
+    """Övervaka knappen i en separat tråd"""
+    global light_on
+    last_button_state = 1
+
+    while True:
+        current_button_state = button.value()
+        
+        # Detektera nedtryckning (från 1 till 0)
+        if last_button_state == 1 and current_button_state == 0:
+            light_on = not light_on  # Slå av/på
+            print(f"\nKnapp tryckt - Ljus är nu: {'PÅ' if light_on else 'AV'}\n")
+            time.sleep(0.3)  # Debounce
+        
+        last_button_state = current_button_state
+        time.sleep(0.1)
+
+# Starta knappövervakning i en separat tråd
+_thread.start_new_thread(check_button, ())
+
 # HUVUDLOOP - Levande ljus-effekt
 try:
     while True:
-        # Långsam pulsande andnings-effekt
-        # Öka ljusstyrka
-        for brightness in range(50, 256, 3):
-            set_warm_color(brightness)
-            time.sleep(0.03)
-        
-        # Minska ljusstyrka
-        for brightness in range(255, 49, -3):
-            set_warm_color(brightness)
-            time.sleep(0.03)
-        
-        # Varierande pauslängd för naturlig känsla
-        time.sleep(random.uniform(0.5, 1.5))
+        if light_on:
+            # Långsam pulsande andnings-effekt
+            # Öka ljusstyrka
+            for brightness in range(50, 256, 3):
+                if not light_on:  # Kolla om knappen trycktes
+                    break
+                set_warm_color(brightness)
+                time.sleep(0.03)
+
+            # Minska ljusstyrka
+            for brightness in range(255, 49, -3):
+                if not light_on:  # Kolla om knappen trycktes
+                    break
+                set_warm_color(brightness)
+                time.sleep(0.03)
+
+            # Varierande pauslängd för naturlig känsla
+            time.sleep(random.uniform(0.5, 1.5))
+        else:
+            # Ljuset är av
+            set_color(0, 0, 0)
+            time.sleep(0.1)
 
 except KeyboardInterrupt:
     print("\nLevande ljus avslutat")
     set_color(0, 0, 0)  # Släck LED:n
-
