@@ -2,6 +2,9 @@ import time
 import random
 from machine import Pin, PWM, reset
 
+# 20 MHz - Väldigt lågt batteri-bruk  
+machine.freq(20000000)
+
 print("=== Levande Ljus ===\n")
 
 # GPIO-pinnar
@@ -42,7 +45,7 @@ try:
     while True:
         # Kontrollera knappen
         if button.value() == 0:
-            print("\n🔄 KNAPP TRYCKT - Startar om ESP32...\n")
+            print("\n KNAPP TRYCKT - Startar om ESP32...\n")
             time.sleep(1)
             reset()
 
