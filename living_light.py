@@ -49,7 +49,7 @@ def check_button():
     
     while True:
         if button.value() == 0:  # Knappen tryckt in (LOW)
-            print("\n🔄 KNAPP TRYCKT - Startar om ESP32...\n")
+            print("\n KNAPP TRYCKT - Startar om ESP32...\n")
             time.sleep(1)
             reset()  # Starta om
         time.sleep(0.05)
