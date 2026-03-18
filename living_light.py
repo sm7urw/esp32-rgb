@@ -1,8 +1,7 @@
 import time
 import random
 import _thread
-import machine
-from machine import Pin, PWM
+from machine import Pin, PWM, reset
 
 print("=== Levande Ljus ===\n")
 
@@ -10,7 +9,6 @@ print("=== Levande Ljus ===\n")
 RED_PIN = 3
 GREEN_PIN = 4
 BLUE_PIN = 5
-BUTTON_PIN = 6
 
 # Konfigurera PWM
 red_pwm = PWM(Pin(RED_PIN), freq=1000)
@@ -18,7 +16,8 @@ green_pwm = PWM(Pin(GREEN_PIN), freq=1000)
 blue_pwm = PWM(Pin(BLUE_PIN), freq=1000)
 
 # Knapp
-button = Pin(BUTTON_PIN, Pin.IN, Pin.PULL_UP)
+button_pin = 6  # GPIO 6
+button = Pin(button_pin, Pin.IN, Pin.PULL_UP)
 
 print("LED initierad - Njut av det levande ljuset!")
 print("Tryck knappen (GPIO 6) för att starta om ESP32\n")
@@ -45,20 +44,15 @@ def set_warm_color(brightness):
     set_color(red, green, blue)
 
 def check_button():
-    """Övervaka knappen - tryck för att starta om ESP32"""
-    last_button_state = 1
+    """Övervaka knappen i en separat tråd"""
+    print("✓ Knappövervakning startad\n")
     
     while True:
-        current_button_state = button.value()
-        
-        # Detektera nedtryckning (från 1 till 0)
-        if last_button_state == 1 and current_button_state == 0:
-            print("\n Knapp tryckt - Startar om ESP32...\n")
+        if button.value() == 0:  # Knappen tryckt in (LOW)
+            print("\n🔄 KNAPP TRYCKT - Startar om ESP32...\n")
             time.sleep(1)
-            machine.reset()  # Starta om
-        
-        last_button_state = current_button_state
-        time.sleep(0.1)
+            reset()  # Starta om
+        time.sleep(0.05)
 
 # Starta knappövervakning i en separat tråd
 _thread.start_new_thread(check_button, ())
