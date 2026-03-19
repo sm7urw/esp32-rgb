@@ -2,8 +2,8 @@ import time
 import random
 from machine import Pin, PWM, reset
 
-# 20 MHz - Väldigt lågt batteri-bruk  
-machine.freq(20000000)
+# 26 MHz - Väldigt lågt batteri-bruk  
+machine.freq(26000000)
 
 print("=== Levande Ljus ===\n")
 
