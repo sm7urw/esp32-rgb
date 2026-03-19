@@ -11,7 +11,7 @@ print("=== Levande Ljus ===\n")
 RED_PIN = 3
 GREEN_PIN = 4
 BLUE_PIN = 5
-BUTTON_PIN = 6
+BUTTON_PIN = 20
 
 # Konfigurera PWM
 red_pwm = PWM(Pin(RED_PIN), freq=1000)
@@ -22,7 +22,7 @@ blue_pwm = PWM(Pin(BLUE_PIN), freq=1000)
 button = Pin(BUTTON_PIN, Pin.IN, Pin.PULL_UP)
 
 print("LED initierad - Njut av det levande ljuset!")
-print("Tryck knappen (GPIO 6) för att starta om ESP32\n")
+print("Tryck knappen (GPIO 20) för att starta om ESP32\n")
 
 def set_color(red, green, blue):
     red_pwm.duty(1023 - int(red * 4.008))
