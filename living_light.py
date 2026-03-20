@@ -85,32 +85,34 @@ def blink_countdown(seconds=3):
 # HUVUDLOOP
 try:
     while True:
-        # Kontrollera knappen med debounce
-        if button.value() == 0:
-            current_time = time.time()
-
-            if current_time - last_button_press > BUTTON_DEBOUNCE:
-                print("\n✓ KNAPP TRYCKT - Omstart initierad\n")
-
-                # Blinkande nedräkning
-                should_reset = blink_countdown(seconds=3)
-
-                if should_reset:
-                    print("\nStartar om ESP32...\n")
-                    time.sleep(1)
-                    reset()
-
-                last_button_press = current_time
-                time.sleep(0.5)  # Lite extra debounce efter feedback
-
-        # Levande ljus-effekt
-        for brightness in range(50, 256, 3):
-            set_warm_color(brightness)
-            time.sleep(0.03)
-        for brightness in range(255, 49, -3):
-            set_warm_color(brightness)
-            time.sleep(0.03)
-        time.sleep(random.uniform(0.5, 1.5))
+        # Slumpmässiga min/max värden för varje cykel (mer variation)
+        cycle_min = random.randint(30, 70)
+        cycle_max = random.randint(200, 255)
+        
+        # Långsam pulsande andnings-effekt med jämn kurva
+        # Öka ljusstyrka (mindre steg = jämnare kurva)
+        for brightness in range(cycle_min, cycle_max, 1):
+            # Mycket flakering - gör ljuset "levande"
+            flicker = random.randint(-20, 25)
+            actual_brightness = max(0, min(255, brightness + flicker))
+            
+            set_warm_color(actual_brightness)
+            time.sleep(0.01)  # Snabbare uppdateringar
+        
+        # Pausa lite på toppen (slumpmässig längd)
+        time.sleep(random.uniform(0.1, 0.5))
+        
+        # Minska ljusstyrka (med samma flakering för konsistens)
+        for brightness in range(cycle_max, cycle_min - 1, -1):
+            flicker = random.randint(-20, 25)
+            actual_brightness = max(0, min(255, brightness + flicker))
+            
+            set_warm_color(actual_brightness)
+            time.sleep(0.01)
+        
+        # Slumpmässig pauslängd mellan pulser (gör det "levande")
+        pause = random.uniform(0.3, 2.0)
+        time.sleep(pause)
 
 except KeyboardInterrupt:
     print("\nLevande ljus avslutat")
