@@ -1,12 +1,13 @@
 import time
 import random
 import _thread
+import machine
 from machine import Pin, PWM, reset
 
 # Sänk CPU-frekvensen för att spara batteri
-machine.freq(80000000)  # 40 MHz istället för 160 MHz
+machine.freq(40000000)  # 40 MHz istället för 160 MHz
 
-print("CPU-frekvens: 40 MHz (spara batteri)\n")
+print("CPU-frekvens: 40 MHz (spara batteri)")
 
 print("=== Levande Ljus ===\n")
 
@@ -56,10 +57,13 @@ def set_warm_color(brightness):
 def check_button():
     """Övervaka knappen i en separat tråd"""
     global light_on
-    print("✓ Knappövervakning startad\n")
+    print("✓ Knappövervakning startad - Väntar på knapptryck...\n")
     
     while True:
-        if button.value() == 0:  # Knappen tryckt in (LOW)
+        button_state = button.value()
+        
+        if button_state == 0:  # Knappen tryckt in (LOW)
+            print("KNAPP TRYCKT - Börjar mäta tid...")
             press_start = time.time()
             
             # Vänta tills knappen släpps
@@ -67,60 +71,68 @@ def check_button():
                 time.sleep(0.05)
             
             press_duration = time.time() - press_start
+            print(f"Knapp släppt efter {press_duration:.2f} sekunder\n")
             
             # Långt tryck (> 2 sekunder) = Omstart
             if press_duration > 2.0:
-                print("\n LÅNGT TRYCK - Startar om ESP32...\n")
+                print("🔄 LÅNGT TRYCK DETEKTERAT - Startar om!\n")
                 time.sleep(1)
                 reset()
             
-            # Kort tryck (< 2 sekunder) = Av/på
-            elif press_duration > 0.3:  # Debounce
+            # Kort tryck (> 0.3 sekunder) = Av/på
+            elif press_duration > 0.3:
                 light_on = not light_on
                 status = "PÅ ✨" if light_on else "AV 🌑"
-                print(f"\n💡 Ljus är nu: {status}\n")
+                print(f"💡 KORT TRYCK - Ljus är nu: {status}\n")
+            else:
+                print("(För kort tryck, ignorera)\n")
         
         time.sleep(0.05)
 
 # Starta knappövervakning i en separat tråd
-_thread.start_new_thread(check_button, ())
+try:
+    _thread.start_new_thread(check_button, ())
+except Exception as e:
+    print(f"ERROR när knappövervakning startades: {e}")
 
 # HUVUDLOOP - Levande ljus-effekt
 try:
     while True:
+        
         if light_on:
-            # Slumpmässiga min/max värden för varje cykel (mer variation)
-            cycle_min = random.randint(20, 50)
-            cycle_max = random.randint(150, 200) # Ändra ljusstyrkan
+            # KAOTISK FLADDRING - mycket mer naturlig än upp-ned mönster!
+            # Istället för att gå från A till B, hoppar vi slumpmässigt omkring
             
-            # Långsam pulsande andnings-effekt med jämn kurva
-            # Öka ljusstyrka (mindre steg = jämnare kurva)
-            for brightness in range(cycle_min, cycle_max, 1):
-                if not light_on:  # Kolla om knappen trycktes
+            current_brightness = random.randint(20, 60)
+            
+            # Slumpmässiga fladdrar - ibland upp, ibland ner, ibland ingenting
+            for _ in range(random.randint(80, 250)):
+                if not light_on:
                     break
-                # Mycket flakering - gör ljuset "levande"
-                flicker = random.randint(-20, 25)
-                actual_brightness = max(0, min(255, brightness + flicker))
+                
+                # Slumpmässig riktning och stegstorlek
+                # Mer sannolikhet för små steg = naturligare rörelse
+                direction = random.choice([-2, -1, -1, 0, 0, 1, 1, 2])
+                
+                # Uppdatera ljusstyrka
+                current_brightness += direction
+                current_brightness = max(15, min(180, current_brightness))
+                
+                # EXTRA flakering för super-naturlig effekt
+                flicker = random.randint(-30, 35)
+                actual_brightness = max(0, min(255, current_brightness + flicker))
                 
                 set_warm_color(actual_brightness)
-                time.sleep(0.01)  # Snabbare uppdateringar
-            
-            # Pausa lite på toppen (slumpmässig längd)
-            time.sleep(random.uniform(0.1, 0.5))
-            
-            # Minska ljusstyrka (med samma flakering för konsistens)
-            for brightness in range(cycle_max, cycle_min - 1, -1):
-                if not light_on:  # Kolla om knappen trycktes
-                    break
-                flicker = random.randint(-20, 25)
-                actual_brightness = max(0, min(255, brightness + flicker))
                 
-                set_warm_color(actual_brightness)
-                time.sleep(0.01)
+                # Slumpmässig tid mellan uppdateringar (gör det ojämnt!)
+                time.sleep(random.uniform(0.003, 0.025))
+                
+                # Slumpmässiga pauser mitt i fladdringen
+                if random.random() < 0.08:  # 8% chans
+                    time.sleep(random.uniform(0.05, 0.2))
             
-            # Slumpmässig pauslängd mellan pulser (gör det "levande")
-            pause = random.uniform(0.3, 2.0)
-            time.sleep(pause)
+            # Slumpmässig pauslängd mellan pulser
+            time.sleep(random.uniform(0.1, 1.2))
         else:
             # Ljuset är av - släck LED:n
             set_color(0, 0, 0)
