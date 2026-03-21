@@ -16,14 +16,14 @@ green_pwm = PWM(Pin(GREEN_PIN), freq=1000)
 blue_pwm = PWM(Pin(BLUE_PIN), freq=1000)
 
 # Knapp
-button_pin = 6  # GPIO 6
+button_pin = 20  # GPIO 20
 button = Pin(button_pin, Pin.IN, Pin.PULL_UP)
 
 # Global flagga för ljus-status
 light_on = True
 
 print("LED initierad - Njut av det levande ljuset!")
-print("Knapp (GPIO 6):")
+print("Knapp (GPIO 20):")
 print("  - Kort tryck = Av/på ljuset")
 print("  - Långt tryck (2+ sekunder) = Omstart ESP32\n")
 
@@ -65,7 +65,7 @@ def check_button():
             
             # Långt tryck (> 2 sekunder) = Omstart
             if press_duration > 2.0:
-                print("\n🔄🔄🔄 LÅNGT TRYCK - Startar om ESP32...\n")
+                print("\n LÅNGT TRYCK - Startar om ESP32...\n")
                 time.sleep(1)
                 reset()
             
