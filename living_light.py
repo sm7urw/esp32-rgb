@@ -3,6 +3,11 @@ import random
 import _thread
 from machine import Pin, PWM, reset
 
+# Sänk CPU-frekvensen för att spara batteri
+machine.freq(40000000)  # 40 MHz istället för 160 MHz
+
+print("CPU-frekvens: 40 MHz (spara batteri)\n")
+
 print("=== Levande Ljus ===\n")
 
 # GPIO-pinnar
@@ -85,8 +90,8 @@ try:
     while True:
         if light_on:
             # Slumpmässiga min/max värden för varje cykel (mer variation)
-            cycle_min = random.randint(30, 70)
-            cycle_max = random.randint(200, 255)
+            cycle_min = random.randint(20, 50)
+            cycle_max = random.randint(150, 200) # Ändra ljusstyrkan
             
             # Långsam pulsande andnings-effekt med jämn kurva
             # Öka ljusstyrka (mindre steg = jämnare kurva)
