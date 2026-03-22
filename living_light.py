@@ -87,7 +87,7 @@ try:
             direction = 1
 
             # Långsam ökning
-            while brightness < 150 and light_on:
+            while brightness < 120 and light_on:
                 set_warm_color(brightness)
                 brightness += 1
                 time.sleep(0.04)
