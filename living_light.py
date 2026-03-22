@@ -90,28 +90,28 @@ try:
             # Slumpmässig fladdring - kaotisk och naturlig
             current_brightness = random.randint(20, 60)
             
-            # Slumpmässiga fladdrar
-            for _ in range(random.randint(80, 250)):
+            # Slumpmässiga fladdrar - LÅNGSAMMARE men tydlig
+            for _ in range(random.randint(120, 300)):
                 if not light_on:
                     break
                 
-                # Slumpmässig riktning
-                direction = random.choice([-2, -1, -1, 0, 0, 1, 1, 2])
+                # Mindre steg = lugnare rörelse
+                direction = random.choice([-1, -1, 0, 0, 0, 1, 1])
                 current_brightness += direction
                 current_brightness = max(15, min(180, current_brightness))
                 
-                # MYCKET flakering för naturlig effekt
-                flicker = random.randint(-30, 35)
+                # Flakering för levande effekt
+                flicker = random.randint(-25, 30)
                 actual_brightness = max(0, min(255, current_brightness + flicker))
                 
                 set_warm_color(actual_brightness)
                 
-                # Ojämn timing
-                time.sleep(random.uniform(0.003, 0.025))
+                # LÅNGSAM uppdatering - detta är nyckeln!
+                time.sleep(random.uniform(0.02, 0.06))
                 
-                # Slumpmässiga pauser
-                if random.random() < 0.08:
-                    time.sleep(random.uniform(0.05, 0.2))
+                # Slumpmässiga pauser (långsammare)
+                if random.random() < 0.05:
+                    time.sleep(random.uniform(0.1, 0.4))
             
             # Paus mellan pulser
             time.sleep(random.uniform(0.1, 1.2))
