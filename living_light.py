@@ -83,7 +83,7 @@ try:
             pulse_counter += 1
 
             # Lugn, långsam pulsation
-            brightness = 50
+            brightness = 40
             direction = 1
 
             # Långsam ökning
@@ -93,7 +93,7 @@ try:
                 time.sleep(0.04)
             
             # Långsam minskning
-            while brightness > 50 and light_on:
+            while brightness > 40 and light_on:
                 set_warm_color(brightness)
                 brightness -= 1
                 time.sleep(0.04)
