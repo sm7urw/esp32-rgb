@@ -5,7 +5,7 @@ import machine
 from machine import Pin, PWM, reset
 
 # Sänk CPU-frekvensen för att spara batteri
-machine.freq(40000000)
+machine.freq(80000000)
 
 print("=== Levande Ljus ===\n")
 
