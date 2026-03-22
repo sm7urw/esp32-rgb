@@ -37,7 +37,7 @@ def set_color(red, green, blue):
 def set_warm_color(brightness):
     """Sätt varm färg med flakering"""
     red = brightness
-    green = int(brightness * 0.5)
+    green = int(brightness * 0.4)
     blue = 0
     
     flicker = random.randint(-20, 25)
